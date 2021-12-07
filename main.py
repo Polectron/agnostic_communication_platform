@@ -6,12 +6,12 @@ from acp_interface import (
     InputGrid,
     InputLayout,
 )
-from acp_output import TerminalPrinter
+from acp_output import TerminalPrinter, FilePrinter
 
 layout = InputLayout()
 
 interface = TerminalInterface(
-    TerminalInputReader(), TerminalPrinter(), InteractMode.MANUAL, layout
+    TerminalInputReader(), FilePrinter("test.txt"), InteractMode.MANUAL, layout
 )
 
 try:
