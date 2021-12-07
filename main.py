@@ -11,7 +11,7 @@ from acp_output import TerminalPrinter, FilePrinter
 layout = InputLayout()
 
 interface = TerminalInterface(
-    TerminalInputReader(), FilePrinter("test.txt"), InteractMode.MANUAL, layout
+    TerminalInputReader(), FilePrinter("outputs/test.txt"), InteractMode.MANUAL, layout
 )
 
 try:
