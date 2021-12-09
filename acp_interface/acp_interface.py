@@ -2,9 +2,10 @@ from typing import Optional
 from acp_input.acp_input import (
     AbstractInput,
     AbstractInputReader,
-    KeyPressInput,
+    CharKeyPressInput,
     PromptInput,
     QuitInput,
+    SendInput,
 )
 from acp_output.acp_output import AbstractOutputWriter
 
@@ -107,15 +108,17 @@ class AbstractInterface(ABC):
     def __init__(
         self,
         input: AbstractInputReader,
-        output: AbstractOutputWriter,
+        outputs: list[AbstractOutputWriter],
         mode: InteractMode,
         layout: BaseInputLayout,
     ):
         self.input = input
-        self.output = output
+        self.outputs = outputs
         self.mode = mode
         self.layout = layout
-        self.inputs_history: list[AbstractInput] = []
+        # self.inputs_history: list[AbstractInput] = []
+
+        self.input_buffer: list[CharKeyPressInput] = []
 
     @abstractmethod
     def draw(self):
@@ -135,7 +138,8 @@ class AbstractInterface(ABC):
 
     def close(self):
         self.input.close()
-        self.output.close()
+        for output in self.outputs:
+            output.close()
 
     @singledispatchmethod
     def _handle_input(self, input: AbstractInput):
@@ -146,8 +150,17 @@ class AbstractInterface(ABC):
         self._quit()
 
     @_handle_input.register
-    def _(self, input: KeyPressInput):
-        self.output.write(input.value.unicode)
+    def _(self, input: CharKeyPressInput):
+        self.input_buffer.append(input)
+
+    @_handle_input.register
+    def _(self, input: SendInput):
+        tmp_string = ""
+        for charkey in self.input_buffer:
+            tmp_string += charkey.value
+        for output in self.outputs:
+            output.write(tmp_string)
+        self.input_buffer.clear()
 
     @_handle_input.register
     def _(self, input: PromptInput):
