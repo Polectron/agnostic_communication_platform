@@ -19,9 +19,15 @@ class QuitInput(AbstractInput):
         super().__init__(value)
 
 
-class KeyPressInput(AbstractInput):
-    def __init__(self, value: Event) -> None:
+class CharKeyPressInput(AbstractInput):
+    def __init__(self, event: Event, value: str) -> None:
         super().__init__(value)
+        self.event: Event = event
+
+
+class SendInput(AbstractInput):
+    def __init__(self) -> None:
+        super().__init__(None)
 
 
 class PromptInput(AbstractInput):

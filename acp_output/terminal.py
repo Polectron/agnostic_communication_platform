@@ -4,7 +4,7 @@ from acp_output.acp_output import AbstractOutputWriter
 
 class TerminalPrinter(AbstractOutputWriter):
     def write(self, input: AbstractInput):
-        print(input, end="")
+        print(input)
 
     def close(self):
         pass

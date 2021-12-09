@@ -1,7 +1,7 @@
 import pygame
 from pygame.constants import K_ESCAPE, K_RETURN, QUIT, KEYDOWN, KEYUP
 from pygame.event import Event
-from acp_input.acp_input import AbstractInputReader, KeyPressInput, PromptInput, QuitInput, StringInput
+from acp_input.acp_input import AbstractInputReader, CharKeyPressInput, PromptInput, QuitInput, SendInput, StringInput
 
 
 class KeyboardInputReader(AbstractInputReader):
@@ -20,11 +20,12 @@ class KeyboardInputReader(AbstractInputReader):
         if event.type == QUIT:
             self.store_input(QuitInput(event))
         elif event.type == KEYUP:
-            print(event)
             if event.key == K_ESCAPE:
                 self.store_input(PromptInput())
+            if event.key == K_RETURN:
+                self.store_input(SendInput())
             else:
                 if event.unicode:
-                    self.store_input(KeyPressInput(event))
+                    self.store_input(CharKeyPressInput(event, event.unicode))
         elif event.type == KEYDOWN:
             ...
