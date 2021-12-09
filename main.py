@@ -1,17 +1,19 @@
 from acp_input import TerminalInputReader
+from acp_input.keyboard import KeyboardInputReader
 from acp_interface import (
     TerminalInterface,
     InteractMode,
-    InputCell,
-    InputGrid,
-    InputLayout,
+    BaseInputLayout,
 )
+from acp_interface.acp_interface import Button, GridLayout
+from acp_interface.visual import VisualInterface
 from acp_output import TerminalPrinter, FilePrinter
 
-layout = InputLayout()
+btn1 = Button((0, 0), (100, 50), label="BTN 1")
+layout = GridLayout((0, 0), (50, 50))
 
-interface = TerminalInterface(
-    TerminalInputReader(), FilePrinter("outputs/test.txt"), InteractMode.MANUAL, layout
+interface = VisualInterface(
+    KeyboardInputReader(), TerminalPrinter(), InteractMode.MANUAL, layout
 )
 
 try:
