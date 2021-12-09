@@ -10,7 +10,6 @@ from acp_input.acp_input import (
 from acp_output.acp_output import AbstractOutputWriter
 
 from enum import Enum
-from collections import OrderedDict
 from abc import ABC, abstractmethod
 from functools import singledispatchmethod
 
@@ -34,9 +33,9 @@ class BaseInputLayout(ABC):
         size: tuple[int, int],
         position: LayoutPosition = LayoutPosition.TOPLEFT,
     ):
-        self.position = origin
+        self.origin = origin
         self.size = size
-        self.center = position
+        self.position = position
 
         self.selected = False
 
@@ -49,11 +48,11 @@ class ColumnLayout(BaseInputLayout):
         position: LayoutPosition = LayoutPosition.TOPLEFT,
     ):
         super().__init__(origin, size, position=position)
-
         self.items: list[BaseInputLayout] = []
-    
+
     def add(self, item: BaseInputLayout):
         self.items.append(item)
+
 
 class RowLayout(BaseInputLayout):
     def __init__(
@@ -83,11 +82,25 @@ class GridLayout(BaseInputLayout):
     ):
         super().__init__(origin, size, position=position)
         self.rows: list[RowLayout] = [
-            RowLayout((0, 0), (0, 0), columns=columns) for _ in range(0, rows + 1)
+            RowLayout((0, 0), (0, 0), columns=columns) for _ in range(0, rows)
         ]
 
     def add(self, row: int, column: int, item: BaseInputLayout):
         self.rows[row].add(column, item)
+
+
+class AbsoluteLayout(BaseInputLayout):
+    def __init__(
+        self,
+        origin: tuple[int, int],
+        size: tuple[int, int],
+        position: LayoutPosition = LayoutPosition.TOPLEFT,
+    ):
+        super().__init__(origin, size, position=position)
+        self.items: list[BaseInputLayout] = []
+
+    def add(self, item: BaseInputLayout):
+        self.items.append(item)
 
 
 class Button(BaseInputLayout):
@@ -116,8 +129,8 @@ class AbstractInterface(ABC):
         self.outputs = outputs
         self.mode = mode
         self.layout = layout
-        # self.inputs_history: list[AbstractInput] = []
 
+        self.inputs_history: list[str] = []
         self.input_buffer: list[CharKeyPressInput] = []
 
     @abstractmethod
@@ -160,6 +173,7 @@ class AbstractInterface(ABC):
             tmp_string += charkey.value
         for output in self.outputs:
             output.write(tmp_string)
+        self.inputs_history.append(tmp_string)
         self.input_buffer.clear()
 
     @_handle_input.register

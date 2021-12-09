@@ -35,6 +35,8 @@ class VisualInterface(AbstractInterface):
         self.alpha_surface = self.surface.convert_alpha()
         pygame.display.set_caption("ACP VKeyboard")
 
+        self.font = pygame.font.SysFont("Arial", 20, bold=True)
+
     def draw(self):
         self.surface.fill(colors.WHITE)
 
@@ -64,15 +66,38 @@ class VisualInterface(AbstractInterface):
 
     @_render.register
     def _(self, input: ColumnLayout):
+        offset = [0, 0]
         for item in input.items:
-            self._render(item)
+            self._render(item, offset)
+            offset[0] += item.size[0]
 
     @_render.register
-    def _(self, input: Button):
+    def _(self, input: Button, offset: tuple[int, int]):
+
+        origin = [*input.origin]
+
+        for i in range(len(offset)):
+            origin[i] += offset[i]
+
+        tmp_surface = pygame.Surface(input.size)
+        tmp_surface.fill(colors.WHITE)
+
+        text = pygame.font.Font.render(self.font, input.label, True, colors.BLACK)
+        text_size = text.get_size()
+        tmp_surface.blit(
+            text,
+            (
+                (input.size[0] / 2) - (text_size[0] / 2),
+                (input.size[1] / 2) - (text_size[1] / 2),
+            ),
+        )
+
         pygame.draw.rect(
-            self.surface,
+            tmp_surface,
             colors.BLACK,
-            (*input.position, *input.size),
+            (0, 0, *input.size),
             width=5,
             border_radius=5,
         )
+
+        self.surface.blit(tmp_surface, (*offset,))
