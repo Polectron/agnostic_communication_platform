@@ -2,8 +2,8 @@ from acp_input.acp_input import AbstractInput, AbstractInputReader, StringInput
 
 
 class TerminalInputReader(AbstractInputReader):
-    def _read_input(self) -> AbstractInput:
-        return StringInput(input())
+    def read_input(self):
+        self.store_input(StringInput(f"{input()}\n"))
 
     def close(self):
         pass

@@ -1,6 +1,8 @@
 from abc import ABC, abstractmethod
 from typing import Any, Optional
 
+from pygame.event import Event
+
 
 class AbstractInput(ABC):
     def __init__(self, value: Any) -> None:
@@ -9,7 +11,22 @@ class AbstractInput(ABC):
 
 class StringInput(AbstractInput):
     def __init__(self, value: str) -> None:
-        self.value = value
+        super().__init__(value)
+
+
+class QuitInput(AbstractInput):
+    def __init__(self, value: Any) -> None:
+        super().__init__(value)
+
+
+class KeyPressInput(AbstractInput):
+    def __init__(self, value: Event) -> None:
+        super().__init__(value)
+
+
+class PromptInput(AbstractInput):
+    def __init__(self) -> None:
+        super().__init__(None)
 
 
 class AbstractInputReader(ABC):
@@ -24,11 +41,8 @@ class AbstractInputReader(ABC):
             return self.input_queue.pop(0)
         return None
 
-    def read_input(self):
-        self.store_input(self._read_input())
-
     @abstractmethod
-    def _read_input(self) -> AbstractInput:
+    def read_input(self):
         raise NotImplementedError()
 
     @abstractmethod
