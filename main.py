@@ -10,9 +10,9 @@ from acp_interface.visual import VisualInterface
 from acp_output import TerminalPrinter, FilePrinter
 from acp_output.tts import TTSWriter
 
-btn1 = Button((0, 0), (100, 50), label="BTN 1")
-btn2 = Button((0, 0), (100, 50), label="BTN 2")
-btn3 = Button((0, 0), (100, 50), label="BTN 3")
+btn1 = Button((0, 0), (150, 90), label="A", icon="images/apple.png", value="A")
+btn2 = Button((0, 0), (150, 90), label="B", value="B")
+btn3 = Button((0, 0), (150, 90), label="C", value="C")
 layout = GridLayout((0, 0), (50, 50))
 layout.add(0, 0, btn1)
 layout.add(0, 0, btn2)

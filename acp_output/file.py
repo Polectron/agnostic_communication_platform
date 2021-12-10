@@ -7,8 +7,8 @@ class FilePrinter(AbstractOutputWriter):
     def __init__(self, filename: str):
         self.file = open(filename, "a")
 
-    def write(self, input: AbstractInput):
-        self.file.write(input.value)
+    def write(self, input: str):
+        self.file.write(input)
 
     def close(self):
         self.file.close()

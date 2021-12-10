@@ -5,7 +5,7 @@ from acp_input.acp_input import AbstractInput
 
 class AbstractOutputWriter(ABC):
     @abstractmethod
-    def write(self, input: AbstractInput):
+    def write(self, input: str):
         raise NotImplementedError()
 
     @abstractmethod

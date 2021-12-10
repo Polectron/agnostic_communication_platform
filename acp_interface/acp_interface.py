@@ -103,7 +103,12 @@ class AbsoluteLayout(BaseInputLayout):
         self.items.append(item)
 
 
-class Button(BaseInputLayout):
+class SelectableInput:
+    def __init__(self):
+        self.selected = False
+
+
+class Button(BaseInputLayout, SelectableInput):
     def __init__(
         self,
         origin: tuple[int, int],
@@ -111,6 +116,7 @@ class Button(BaseInputLayout):
         position: LayoutPosition = LayoutPosition.TOPLEFT,
         label: Optional[str] = None,
         icon: Optional[str] = None,
+        value: Optional[str] = None,
     ):
         super().__init__(origin, size, position=position)
         self.label: Optional[str] = label
@@ -132,6 +138,9 @@ class AbstractInterface(ABC):
 
         self.inputs_history: list[str] = []
         self.input_buffer: list[CharKeyPressInput] = []
+
+        # TODO build a list with the sequential order of selection of inputs, recursively visiting inputs until leafs with actions (primarily buttons)
+        self._selection_order_list: list[SelectableInput] = []
 
     @abstractmethod
     def draw(self):

@@ -35,7 +35,8 @@ class VisualInterface(AbstractInterface):
         self.alpha_surface = self.surface.convert_alpha()
         pygame.display.set_caption("ACP VKeyboard")
 
-        self.font = pygame.font.SysFont("Arial", 20, bold=True)
+        self.font = pygame.font.SysFont("Arial", 40, bold=True)
+        self._images_cache: dict[str, pygame.surface.Surface] = {}
 
     def draw(self):
         self.surface.fill(colors.WHITE)
@@ -82,22 +83,53 @@ class VisualInterface(AbstractInterface):
         tmp_surface = pygame.Surface(input.size)
         tmp_surface.fill(colors.WHITE)
 
-        text = pygame.font.Font.render(self.font, input.label, True, colors.BLACK)
-        text_size = text.get_size()
-        tmp_surface.blit(
-            text,
-            (
-                (input.size[0] / 2) - (text_size[0] / 2),
-                (input.size[1] / 2) - (text_size[1] / 2),
-            ),
-        )
+        border = 5
+
+        if input.icon:
+            try:
+                icon = self._load_image(input.icon)
+                icon_size = icon.get_size()
+                min_btn_size = min(*input.size)
+                max_icon_size = max(*icon_size)
+                ratio = 1
+                if max_icon_size > min_btn_size:
+                    ratio = max_icon_size/min_btn_size
+                
+                scaled_size = ((icon_size[0] / ratio) - (border+5), (icon_size[1] / ratio) - (border+5))
+                
+                icon = pygame.transform.scale(icon, scaled_size)
+                tmp_surface.blit(
+                    icon,
+                    (
+                        (input.size[0] / 2) - (scaled_size[0] / 2),
+                        (input.size[1] / 2) - (scaled_size[1] / 2),
+                    ),
+                )
+            except Exception:
+                pass
+
+        if input.label:
+            text = pygame.font.Font.render(self.font, input.label, True, colors.BLACK)
+            text_size = text.get_size()
+            tmp_surface.blit(
+                text,
+                (
+                    (input.size[0] / 2) - (text_size[0] / 2),
+                    (input.size[1] / 2) - (text_size[1] / 2),
+                ),
+            )
 
         pygame.draw.rect(
             tmp_surface,
             colors.BLACK,
             (0, 0, *input.size),
-            width=5,
+            width=border,
             border_radius=5,
         )
 
         self.surface.blit(tmp_surface, (*offset,))
+
+    def _load_image(self, img_path: str):
+        if img_path not in self._images_cache:
+            self._images_cache[img_path] = pygame.image.load(img_path)
+        return self._images_cache[img_path]
