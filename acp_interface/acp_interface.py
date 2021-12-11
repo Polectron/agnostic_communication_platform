@@ -140,7 +140,8 @@ class AbstractInterface(ABC):
         self.input_buffer: list[CharKeyPressInput] = []
 
         # TODO build a list with the sequential order of selection of inputs, recursively visiting inputs until leafs with actions (primarily buttons)
-        self._selection_order_list: list[SelectableInput] = []
+        self._selected: int = 0
+        self._selection_order_list: list[SelectableInput] = self._build_selection_order_list()
 
     @abstractmethod
     def draw(self):
@@ -192,3 +193,6 @@ class AbstractInterface(ABC):
     @abstractmethod
     def _render(self, input: BaseInputLayout):
         raise NotImplementedError(f"Input type {type(input)} not handled")
+
+    def _build_selection_order_list(self) -> list[SelectableInput]:
+        return []

@@ -1,6 +1,7 @@
 from functools import singledispatchmethod
 import sys
 import pygame
+import math
 
 from acp_input.acp_input import AbstractInput, AbstractInputReader
 from acp_interface import colors
@@ -12,6 +13,7 @@ from acp_interface.acp_interface import (
     GridLayout,
     InteractMode,
     RowLayout,
+    SelectableInput,
 )
 from acp_output.acp_output import AbstractOutputWriter
 
@@ -42,6 +44,7 @@ class VisualInterface(AbstractInterface):
         self.surface.fill(colors.WHITE)
 
         self._render(self.layout)
+        self._draw_fps_counter()
 
         pygame.display.update()
         self.fps_clock.tick(FPS)
@@ -93,10 +96,13 @@ class VisualInterface(AbstractInterface):
                 max_icon_size = max(*icon_size)
                 ratio = 1
                 if max_icon_size > min_btn_size:
-                    ratio = max_icon_size/min_btn_size
-                
-                scaled_size = ((icon_size[0] / ratio) - (border+5), (icon_size[1] / ratio) - (border+5))
-                
+                    ratio = max_icon_size / min_btn_size
+
+                scaled_size = (
+                    (icon_size[0] / ratio) - (border + 5),
+                    (icon_size[1] / ratio) - (border + 5),
+                )
+
                 icon = pygame.transform.scale(icon, scaled_size)
                 tmp_surface.blit(
                     icon,
@@ -119,9 +125,13 @@ class VisualInterface(AbstractInterface):
                 ),
             )
 
+        border_color = colors.BLACK
+        if self._is_selected(input):
+            border_color = colors.RED
+
         pygame.draw.rect(
             tmp_surface,
-            colors.BLACK,
+            border_color,
             (0, 0, *input.size),
             width=border,
             border_radius=5,
@@ -133,3 +143,19 @@ class VisualInterface(AbstractInterface):
         if img_path not in self._images_cache:
             self._images_cache[img_path] = pygame.image.load(img_path)
         return self._images_cache[img_path]
+
+    def _is_selected(self, input: AbstractInput) -> bool:
+        try:
+            return input == self._selection_order_list[self._selected]
+        except Exception:
+            return False
+
+    def _draw_fps_counter(self):
+        fps_text = pygame.font.Font.render(
+            self.font, str(math.ceil(self.fps_clock.get_fps())), True, colors.RED
+        )
+        fps_text_size = fps_text.get_size()
+        self.surface.blit(
+            fps_text,
+            (self.surface.get_size()[0]-fps_text_size[0], self.surface.get_size()[1]-fps_text_size[1])
+        )
